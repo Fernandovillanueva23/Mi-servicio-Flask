@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>IndexLogin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,300" rel="stylesheet" type="text/css">
+   	<link rel="stylesheet" href="static/css/bootstrap.min.css">
+	<link rel="stylesheet" href="static/css/animate.css">
+	<link rel="stylesheet" href="static/css/style.css">
+
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <!-- Puedes agregar algo aquí si lo deseas -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <form action="/login" method="POST">
+                <h2>Introduce tus datos</h2>
+                <div class="form-group">
+                    <label for="username" class="sr-only">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                           autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="sr-only">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password"
+                           autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                   <a href="{{ url_for('forgot_password') }}">Contraseña olvidada</a>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Iniciar Sesión" class="btn btn-primary">
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+    <div class="row" style="padding-top: 60px; clear: both;">
+        <!-- Puedes agregar algo aquí si lo deseas -->
+    </div>
+</div>
+
+</body>
+</html>

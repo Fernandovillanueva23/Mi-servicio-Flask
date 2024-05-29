@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="{{ url_for('serve_static3', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="profile-container">
+        {% if user['username'] == "pepelu" %}
+        <!-- Contenido específico para el usuario "pepelu" -->
+        <div class="profile-sidebar">
+            <img src="{{ url_for('serve_static3', filename='img/elbicho.jpg') }}" alt="Profile Picture" class="profile-picture">
+            <ul class="profile-menu">
+                <li>Perfil</li>
+                <li>Enviar Mensaje</li>
+                <li>Opciones</li>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/logout">Cerrar Sesion</a></li>
+            </ul>
+            <div class="social-media">
+                <a href="https://www.Instagram.com" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/iglogo.png') }}" alt="Instagram" style="width: 24px; height: 24px;">
+                </a>
+                <a href="https://www.twitter.com/l" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/xlogo.jpeg') }}" alt="Twitter" style="width: 24px; height: 24px;">
+                </a>
+                <a href="https://www.linkedin.com" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/linkedinlogo.jpg') }}" alt="LinkedIn" style="width: 24px; height: 24px;">
+                </a>
+            </div>
+        </div>
+        <div class="profile-main">
+            <h1>Bienvenido, <span class="highlight">{{ user['username'] }}</span></h1>
+            <p>Años de experiencia, experto en Lee Sin y Graves, enfoque en control de mapa y emboscadas efectivas</p>
+            <section class="about-me">
+                <h2>Informacion</h2>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum nemo odit aspernatur id autem temporibus
+                    maxime dignissimos placeat consequuntur quas omnis sapiente sint, provident impedit ab eligendi numquam
+                    debitis laudantium!.
+                </p>
+            </section>
+        </div>
+        {% elif user['username'] == "luchito" %}
+        <!-- Contenido específico para el usuario "luchito" -->
+        <div class="profile-sidebar">
+            <img src="{{ url_for('serve_static3', filename='img/xavi.jpg') }}" alt="Profile Picture" class="profile-picture">
+            <ul class="profile-menu">
+                <li>Perfil</li>
+                <li>Enviar Mensaje</li>
+                <li>Opciones</li>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/logout">Cerrar Sesion</a></li>
+            </ul>
+            <div class="social-media">
+                <a href="https://www.Instagram.com" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/iglogo.png') }}" alt="Instagram" style="width: 24px; height: 24px;">
+                </a>
+                <a href="https://www.twitter.com/l" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/xlogo.jpeg') }}" alt="Twitter" style="width: 24px; height: 24px;">
+                </a>
+                <a href="https://www.linkedin.com" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/linkedinlogo.jpg') }}" alt="LinkedIn" style="width: 24px; height: 24px;">
+                </a>
+            </div>
+        </div>
+        <div class="profile-main">
+            <h1>Bienvenido, <span class="highlight">{{ user['username'] }}</span></h1>
+            <p>Años de experiencia, experto en Lee Sin y Graves, enfoque en control de mapa y emboscadas efectivas</p>
+            <section class="about-me">
+                <h2>Informacion</h2>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum nemo odit aspernatur id autem temporibus
+                    maxime dignissimos placeat consequuntur quas omnis sapiente sint, provident impedit ab eligendi numquam
+                    debitis laudantium!.
+                </p>
+            </section>
+        </div>
+        {% else %}
+        <!-- Contenido para otros usuarios -->
+        <div class="profile-sidebar">
+            <img src="{{ url_for('serve_static3', filename='img/default.jpg') }}" alt="Profile Picture" class="profile-picture">
+            <ul class="profile-menu">
+                <li>Perfil</li>
+                <li>Enviar Mensaje</li>
+                <li>Opciones</li>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/logout">Cerrar Sesion</a></li>
+            </ul>
+            <div class="social-media">
+                <a href="https://www.Instagram.com" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/iglogo.png') }}" alt="Instagram" style="width: 24px; height: 24px;">
+                </a>
+                <a href="https://www.twitter.com/l" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/xlogo.jpeg') }}" alt="Twitter" style="width: 24px; height: 24px;">
+                </a>
+                <a href="https://www.linkedin.com" target="_blank">
+                    <img src="{{ url_for('serve_static3', filename='img/linkedinlogo.jpg') }}" alt="LinkedIn" style="width: 24px; height: 24px;">
+                </a>
+            </div>
+        </div>
+        <div class="profile-main">
+            <h1>Bienvenido, <span class="highlight">{{ user['username'] }}</span></h1>
+            <p>Años de experiencia, experto en Lee Sin y Graves, enfoque en control de mapa y emboscadas efectivas</p>
+            <section class="about-me">
+                <h2>Informacion</h2>
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum nemo odit aspernatur id autem temporibus
+                    maxime dignissimos placeat consequuntur quas omnis sapiente sint, provident impedit ab eligendi numquam
+                    debitis laudantium!.
+                </p>
+            </section>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
