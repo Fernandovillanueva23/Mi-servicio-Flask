@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from pymongo import MongoClient
 
 app = Flask(__name__, static_folder="templates/static")
 app.secret_key = 'your_secret_key'
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -14,6 +16,7 @@ login_manager.login_view = "login"
 client = MongoClient("mongodb://35.180.31.99:27017/?directConnection=true&appName=mongosh+2.0.0")
 db = client["ServiceWeb"]
 col = db["Userslol"]
+msj_col = db["Messages"]
 
 class User(UserMixin):
     def __init__(self, id, name, email):
@@ -36,7 +39,7 @@ def login():
 
         user = col.find_one({'username': username})
 
-        if user and user['password'] == password:
+        if user and check_password_hash(user["password_hash"],password):
             user_obj = User(id=username, name=user.get("name"), email=user.get("email"))
             login_user(user_obj)
             flash("Login exitoso", 'success')
@@ -74,14 +77,11 @@ def profile(username):
 
     if request.method == "POST":
 
-        # col.update_one({'username': current_user.id}, {'$set': {'name': request.form['name'], 'email': request.form['email']}})
         flash("Datos del perfil actualizados.", 'success')
         print("Datos del perfil actualizados")
         return redirect(url_for('profile', username=username))
 
     return render_template('profile.html', user=user)
-
-
 
 @app.route('/logout')
 @login_required
@@ -101,9 +101,39 @@ def serve_static3(filename):
     directory = os.path.join(app.root_path, "templates/static3")
     return send_from_directory(directory, filename)
 
+@app.route("/static4/<path:filename>")
+def serve_static4(filename):
+    directory = os.path.join(app.root_path, "templates/static4")
+    return send_from_directory(directory, filename)
+
+@app.route('/chat')
+@login_required
+def chat():
+    return render_template("chat.html")
+
+@app.route("/messages",methods= ["GET","POST"])
+@login_required
+def messages():
+    if request.method == "POST":
+        content = request.json
+        message = {
+            "user": current_user.id,
+            "message": content["message"]
+        }
+        msj_col.insert_one(message)
+        return jsonify(message)
+    elif request.method == "GET":
+        messages = list(msj_col.find().sort("_id",-1).limit(50))
+        for message in messages:
+            message ["_id"] = str(message["_id"])
+        messages.reverse()
+        return jsonify(messages)
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
+
+
+
