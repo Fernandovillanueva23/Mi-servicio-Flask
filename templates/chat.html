@@ -5,91 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
     <link rel="stylesheet" href="static4/css/style.css">
-  <script>
-       document.addEventListener("DOMContentLoaded", function() {
-            const messagesDiv = document.getElementById("messages");
-            const messageInput = document.getElementById("messageInput");
-            const sendButton = document.getElementById("sendButton");
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+             const messagesDiv = document.getElementById("messages");
+             const messageInput = document.getElementById("messageInput");
+             const sendButton = document.getElementById("sendButton");
 
-            function fetchMessages() {
-                fetch('/messages')
-                    .then(response => response.json())
-                    .then(data => {
-                        messagesDiv.innerHTML = '';
-                        data.forEach(message => {
-                            const messageDiv = document.createElement('div');
-                            messageDiv.classList.add('message');
-                            if (message.user === '{{ current_user.id }}') {
-                                messageDiv.classList.add('user');
-                            }
-                            messageDiv.textContent = `${message.user}: ${message.message}`;
-                            messagesDiv.appendChild(messageDiv);
-                        });
-                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    });
+             function fetchMessages() {
+                 fetch('/messages')
+                     .then(response => response.json())
+                     .then(data => {
+                         messagesDiv.innerHTML = '';
+                         data.forEach(message => {
+                             const messageDiv = document.createElement('div');
+                             messageDiv.classList.add('message');
+                             if (message.user === '{{ current_user.id }}') {
+                                 messageDiv.classList.add('user');
+                             }
+                             messageDiv.textContent = `${message.user}: ${message.message}`;
+                             messagesDiv.appendChild(messageDiv);
+                         });
+                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                     });
+             }
+
+             function sendMessage() {
+                 const message = messageInput.value;
+                 if (message.trim() !== '') {
+                     fetch('/messages', {
+                         method: 'POST',
+                         headers: {
+                             'Content-Type': 'application/json'
+                         },
+                         body: JSON.stringify({ message: message })
+                     }).then(() => {
+                         messageInput.value = '';
+                         fetchMessages();
+                     });
+                 }
+             }
+
+             sendButton.addEventListener('click', sendMessage);
+             messageInput.addEventListener('keypress', function(e) {
+                 if (e.key === 'Enter') {
+                     sendMessage();
+                 }
+             });
+
+             setInterval(fetchMessages, 1000);
+         });
+    </script>
+    <script> let lastMessageId = null;
+
+function pollMessages() {
+    let url = '/poll_messages';
+    if (lastMessageId) {
+        url += '?last_message_id=' + lastMessageId;
+    }
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                lastMessageId = data[data.length - 1]._id;
+                displayMessages(data);
             }
+            pollMessages();
+        })
+        .catch(error => {
+            console.error('Error polling messages:', error);
+            setTimeout(pollMessages, 5000);
+}
 
-            function sendMessage() {
-                const message = messageInput.value;
-                if (message.trim() !== '') {
-                    fetch('/messages', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ message: message })
-                    }).then(() => {
-                        messageInput.value = '';
-                        fetchMessages();
-                    });
-                }
-            }
+function displayMessages(messages) {
+    messages.forEach(message => {
+        console.log(message);
 
-            sendButton.addEventListener('click', sendMessage);
-            messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+    });
+}
 
-            setInterval(fetchMessages, 1000);
-        });
-  </script>
+pollMessages(); // Iniciar el polling
+</script>
+
 </head>
 <body>
-    <div class="chat-container">
-        <div class="user-list">
-            <input type="text" placeholder="Search...">
-            <ul>
-                <li>
-                    <img src="static4/img/xavi.jpg" alt="Vincent Porter">
-                    <div class="user-info">
-                        <div class="user-name">Luchito</div>
-                        <div class="user-status">left 7 mins ago</div>
-                    </div>
-                </li>
-                <li>
-                    <img src="static4/img/pepito.jpg" alt="Aiden Chavez">
-                    <div class="user-info">
-                        <div class="user-name">Pepito</div>
-                        <div class="user-status">online</div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <div class="chat-box">
-            <div class="chat-header">
-                <h2>Chat</h2>
-            </div>
-            <ul id="messages" class="chat-messages"></ul>
-            <div class="chat-input">
-                <input id="messageInput" autocomplete="off" placeholder="Enter text here...">
-                <button id="sendButton">Send</button>
-            </div>
-        </div>
-       </div>
-        <button class="profile-button"> <a href="/profile/{{ current_user.id }}">Volver al Perfil</a></button>
+<div class="chat-container">
+    <div class="user-list">
+        <input type="text" placeholder="Search...">
+        <ul>
+            <li>
+                <img src="static4/img/xavi.jpg" alt="Vincent Porter">
+                <div class="user-info">
+                    <div class="user-name">Luchito</div>
+                    <div class="user-status">left 7 mins ago</div>
+                </div>
+            </li>
+            <li>
+                <img src="static4/img/pepito.jpg" alt="Aiden Chavez">
+                <div class="user-info">
+                    <div class="user-name">Pepito</div>
+                    <div class="user-status">online</div>
+                </div>
+            </li>
+        </ul>
     </div>
+    <div class="chat-box">
+        <div class="chat-header">
+            <h2>Chat</h2>
+        </div>
+        <ul id="messages" class="chat-messages"></ul>
+        <div class="chat-input">
+            <input id="messageInput" autocomplete="off" placeholder="Enter text here...">
+            <button id="sendButton">Send</button>
+        </div>
     </div>
+</div>
+<button class="profile-button"><a href="/profile/{{ current_user.id }}">Volver al Perfil</a></button>
+</div>
+</div>
 </body>
 </html>

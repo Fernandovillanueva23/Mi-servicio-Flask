@@ -1,3 +1,4 @@
+import time
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,7 +7,6 @@ from pymongo import MongoClient
 
 app = Flask(__name__, static_folder="templates/static")
 app.secret_key = 'your_secret_key'
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -39,7 +39,7 @@ def login():
 
         user = col.find_one({'username': username})
 
-        if user and check_password_hash(user["password_hash"],password):
+        if user and check_password_hash(user["password_hash"], password):
             user_obj = User(id=username, name=user.get("name"), email=user.get("email"))
             login_user(user_obj)
             flash("Login exitoso", 'success')
@@ -67,7 +67,7 @@ def home():
     print("Accediendo a la página de inicio")
     return render_template("home.html")
 
-@app.route('/profile/<username>', methods=["GET","POST"])
+@app.route('/profile/<username>', methods=["GET", "POST"])
 @login_required
 def profile(username):
     user = col.find_one({'username': current_user.id})
@@ -76,7 +76,6 @@ def profile(username):
         return redirect(url_for('home'))
 
     if request.method == "POST":
-
         flash("Datos del perfil actualizados.", 'success')
         print("Datos del perfil actualizados")
         return redirect(url_for('profile', username=username))
@@ -111,29 +110,85 @@ def serve_static4(filename):
 def chat():
     return render_template("chat.html")
 
-@app.route("/messages",methods= ["GET","POST"])
+@app.route('/messages', methods=["GET", "POST"])
 @login_required
 def messages():
     if request.method == "POST":
         content = request.json
+        if not content or 'message' not in content:
+            return jsonify({"error": "Invalid input"}), 400
+
         message = {
             "user": current_user.id,
             "message": content["message"]
         }
         msj_col.insert_one(message)
-        return jsonify(message)
+        return jsonify(message), 201
+
     elif request.method == "GET":
-        messages = list(msj_col.find().sort("_id",-1).limit(50))
+        messages = list(msj_col.find().sort("_id", -1).limit(50))
         for message in messages:
-            message ["_id"] = str(message["_id"])
+            message["_id"] = str(message["_id"])
         messages.reverse()
-        return jsonify(messages)
+        return jsonify(messages), 200
+
+@app.route('/poll_messages')
+@login_required
+def poll_messages():
+    last_message_id = request.args.get('last_message_id')
+    while True:
+        messages = list(msj_col.find().sort("_id", -1).limit(50))
+        if last_message_id:
+            messages = [message for message in messages if str(message["_id"]) > last_message_id]
+        if messages:
+            for message in messages:
+                message["_id"] = str(message["_id"])
+            return jsonify(messages), 200
+        time.sleep(1)
 
 
+
+
+# Rutas de API
+@app.route('/api/messages', methods=["GET", "POST"])
+@login_required
+def api_messages():
+    if request.method == "POST":
+        content = request.json
+        if not content or 'message' not in content:
+            return jsonify({"error": "Invalid input"}), 400
+
+        message = {
+            "user": current_user.id,
+            "message": content["message"]
+        }
+        msj_col.insert_one(message)
+        return jsonify(message), 201
+
+    elif request.method == "GET":
+        messages = list(msj_col.find().sort("_id", -1).limit(50))
+        for message in messages:
+            message["_id"] = str(message["_id"])
+        messages.reverse()
+        return jsonify(messages), 200
+
+@app.route('/api/users/<username>', methods=["GET"])
+@login_required
+def get_user(username):
+    user = col.find_one({"username": username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    user["_id"] = str(user["_id"])
+    return jsonify(user), 200
+
+@app.route('/api/users', methods=["GET"])
+@login_required
+def list_users():
+    users = list(col.find())
+    for user in users:
+        user["_id"] = str(user["_id"])
+    return jsonify(users), 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    app.run(host='0.0.0.0', port=80)
-
-
-
+    app.run(debug=True, host='0.0.0.0', port=80)
